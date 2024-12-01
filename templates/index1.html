@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="icon" href="static/icon.png">
+    <title>Nextcloud</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style1.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+<body>
+    <div class="article">
+        <div class="wrapper">
+            <img src="{{ url_for('static', filename='nextcloud.png') }}" alt="Logo">
+            <div class="lefthd flex">
+                <div class="search flex">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="search-input" placeholder="Search File" autocomplete="off">
+                </div>
+            </div>
+            <header>Upload to Cloud</header>
+
+            <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data" class="form-upload">
+                <input type="hidden" name="folder" value="{{ current_folder }}">
+                <input type="file" id="file-input" class="file-input" name="file" style="display: none;">
+                <label for="file-input" class="fp">
+                    
+                    <i class="fa-solid fa-file-arrow-up"></i>
+                    <p>Browse File to Upload</p>
+                </label>
+            </form>
+            <p id="fileName">No file chosen</p>
+            <button type="submit" class="submit-file">Submit</button>
+            
+            <div class="f-folder">
+                <form action="{{ url_for('create_folder') }}" method="post" class="form-folder" id="createFolderForm">
+                    <input type="hidden" name="current_folder" value="{{ current_folder }}">  
+                    <i class="fas fa-cloud-upload-alt" style="margin-top: 10px;"></i>
+                    <input type="text" id="folder-input" name="folder_name" placeholder="Input Folder Name" autocomplete="off">
+                </form>
+                <button type="button" class="submit-folder">Create Folder</button>
+            </div>
+        </div>
+        <div class="right">
+            <div class="header-re">
+                <button class="btn-reply"><i class="fa-solid fa-reply"></i></button>
+                <header>Files & Folders Uploaded Cloud</header>
+                <button class="btn-logout"><i class="fa-solid fa-right-to-bracket" style="margin-right: 6px;"></i>Logout</button>
+            </div>
+            <section class="folder-area">
+                {% for folder in folders %}
+                <li class="row folder" data-name="{{ folder | lower }}">
+                    <div class="content">
+                        <i class="fas fa-folder"></i>
+                        <div class="details">
+                            <a href="{{ url_for('home', folder=current_folder + folder + '/') }}" class="name">{{ folder }}</a>
+                        </div>
+                    </div>
+                    <form action="{{ url_for('delete_folder') }}" method="post" style="display: none;" class="delete-form">
+                        <input type="hidden" name="folder" value="{{ folder }}">
+                        <input type="hidden" name="current_folder" value="{{ current_folder }}">
+                    </form>
+                    <button class="delete-folder" data-folder="{{ folder }}"><i class="fas fa-trash-alt"></i></button>                    
+                </li>
+                {% endfor %}
+            </section>
+            
+            <section class="progress-area"></section>
+            <section class="uploaded-area">
+                {% for file in files %}
+                <li class="row file" data-name="{{ file | lower }}">
+                    <div class="content">
+                        <i class="{{ icons[file] }}"></i>
+                        <div class="details">
+                            <a href="{{ url_for('download', filename=file) }}" class="name">{{ file }}</a>
+                            <span class="size">{{ sizes[file] }} </span>
+                        </div> 
+                    </div>
+                    <div class="right-lm">
+                        <span class="last-modified">Last modified: {{ last_modified[file] }}</span>
+                        <i class="fas fa-check" style="margin-left: 10px;"></i>
+                        <form class="share-file-form" style="display: none;">
+                            <input type="text" class="share-username" placeholder="Input username">
+                            <button type="button" class="submit-share" data-file="{{ file }}">Share</button>
+                        </form>
+                        <button class="share-file" data-file="{{ file }}"><i class="fas fa-share-alt"></i></button>
+                        
+                        <form action="{{ url_for('delete_file') }}" method="post" style="display: none;" class="delete-form">
+                            <input type="hidden" name="file" value="{{ file }}">
+                            <input type="hidden" name="current_folder" value="{{ current_folder }}">
+                        </form>
+                        <button class="delete-file" data-file="{{ file }}"><i class="fas fa-trash-alt"></i></button>
+                        
+                        
+                    </div>
+                </li>
+                {% endfor %}
+            </section>
+        </div>
+    </div>
+</body>
+</html>
